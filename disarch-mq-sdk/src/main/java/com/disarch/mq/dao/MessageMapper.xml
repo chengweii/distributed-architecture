@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.disarch.mq.dao.MessageMapper">
+    <insert id="insert" parameterType="com.disarch.mq.dao.entity.DbMessage">
+        <selectKey resultType="java.lang.Integer" keyProperty="id"
+                   order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+        INSERT INTO scm_message (exchange,routing,message) VALUES
+        (#{exchange}, #{routing}, #{message})
+    </insert>
+
+    <delete id="delete" parameterType="long">
+        DELETE FROM scm_message where id = #{id}
+    </delete>
+</mapper>
