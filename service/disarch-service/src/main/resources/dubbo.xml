@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+
+    <import resource="classpath:spring.xml"/>
+
+    <bean id="dubboProps" class="com.dangdang.config.service.zookeeper.ZookeeperConfigGroup">
+        <constructor-arg name="configProfile" ref="serviceConfigProfile" />
+        <constructor-arg name="node" value="dubbo" />
+    </bean>
+
+    <dubbo:application id="serviceApplication" name="disarch-service" logger="slf4j"/>
+
+    <dubbo:protocol name="dubbo" port="#{dubboProps['dubbo.protocol.port']}"
+                    heartbeat="#{dubboProps['dubbo.protocol.heartbeat']}"
+                    threads="#{dubboProps['dubbo.protocol.threads']}"
+                    accepts="#{dubboProps['dubbo.protocol.accepts']}"/>
+
+    <dubbo:provider delay="-1" filter="exception"/>
+
+    <dubbo:monitor protocol="registry"/>
+
+    <dubbo:registry protocol="#{dubboProps['register_protocol']}" address="#{dubboProps['register_address']}"
+                    session="#{dubboProps['register_session_expire']}"
+                    client="curator" file="#{dubboProps['dubbo.registry.file']}"/>
+
+    <dubbo:service version="1.1" group="direct" timeout="#{dubboProps['provider.timeout']}" retries="0"
+                   application="serviceApplication"
+                   ref="cacheService" interface="com.disarch.service.cache.ICacheService"/>
+</beans>

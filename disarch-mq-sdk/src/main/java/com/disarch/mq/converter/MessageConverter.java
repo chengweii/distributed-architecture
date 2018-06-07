@@ -1,23 +1,21 @@
 package com.disarch.mq.converter;
 
 import com.disarch.mq.entity.BaseMessage;
-import com.google.gson.Gson;
+import com.disarch.util.GsonUtils;
+
 
 public class MessageConverter implements IMessageConverter{
-    private Gson gson;
-
-    public MessageConverter(Gson gson) {
+    public MessageConverter() {
         super();
-        this.gson = gson;
     }
 
     @Override
     public <T extends BaseMessage> String serialize(T message) {
-        return gson.toJson(message);
+        return GsonUtils.toJson(message);
     }
 
     @Override
     public <T extends BaseMessage> T deserialize(String msg, Class<T> messageClazz) {
-        return gson.fromJson(msg, messageClazz);
+        return GsonUtils.fromJson(msg, messageClazz);
     }
 }

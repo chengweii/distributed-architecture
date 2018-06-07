@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xmlns:c="http://www.springframework.org/schema/c" xmlns:p="http://www.springframework.org/schema/p"
+       xsi:schemaLocation="http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.4.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+    <bean id="mqProps" class="com.dangdang.config.service.zookeeper.ZookeeperConfigGroup">
+        <constructor-arg name="configProfile" ref="serviceConfigProfile" />
+        <constructor-arg name="node" value="mq" />
+    </bean>
+
+    <rabbit:connection-factory id="connectionFactory" virtual-host="#{mqProps['mq.virtual-host']}" addresses="#{mqProps['mq.addresses']}"
+                               username="#{mqProps['mq.username']}" password="#{mqProps['mq.password']}" />
+
+    <rabbit:template id="rabbitTemplate" connection-factory="connectionFactory"/>
+
+    <bean id="messageConverter" class="com.disarch.mq.converter.MessageConverter" />
+
+    <bean id="messageService" class="com.disarch.mq.service.MessageService" c:rabbitTemplate-ref="rabbitTemplate" c:messageConverter-ref="messageConverter" />
+
+    <bean id="orderSyncConsumer" class="com.disarch.service.mq.OrderSyncConsumer"/>
+
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="auto" concurrency="50" requeue-rejected="false" >
+        <rabbit:listener ref="orderSyncConsumer" method="handle"  queue-names="#{mqProps['mq.queue.order-sync']}"/>
+    </rabbit:listener-container>
+</beans>

@@ -8,5 +8,10 @@
     <artifactId>disarch-service-package</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
+    <modules>
+        <module>../disarch-service</module>
+        <module>../disarch-service-parent</module>
+        <module>../disarch-service-sdk</module>
+    </modules>
 
 </project>

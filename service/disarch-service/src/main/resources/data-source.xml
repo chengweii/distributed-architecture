@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
+
+    <bean id="jdbcProps" class="com.dangdang.config.service.zookeeper.ZookeeperConfigGroup">
+        <constructor-arg name="configProfile" ref="znServiceConfigProfile" />
+        <constructor-arg name="node" value="jdbc" />
+    </bean>
+
+    <!--proxy-target-class="true"强制使用cglib代理 如果为false则spring会自动选择 -->
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+
+    <!-- ================数据源============== -->
+    <!-- 数据源父类：提供连接池配置 -->
+    <bean id="dataSourceBase" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="#{jdbcProps['driverClass']}" />
+        <!-- 配置初始化大小、最小、最大 -->
+        <property name="initialSize" value="#{jdbcProps['pool.initialSize']}" />
+        <property name="minIdle" value="#{jdbcProps['pool.minIdle']}" />
+        <property name="maxActive" value="#{jdbcProps['pool.maxActive']}" />
+        <!-- 配置获取连接等待超时的时间 -->
+        <property name="maxWait" value="60000" />
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+        <property name="timeBetweenEvictionRunsMillis" value="60000" />
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+        <property name="minEvictableIdleTimeMillis" value="300000" />
+        <property name="validationQuery" value="SELECT 'x'" />
+        <property name="testWhileIdle" value="true" />
+        <property name="testOnBorrow" value="false" />
+        <property name="testOnReturn" value="false" />
+        <!-- 配置监控统计拦截的filters -->
+        <property name="filters" value="stat" />
+    </bean>
+
+    <!-- main database -->
+    <bean id="main-master" parent="dataSourceBase">
+        <property name="url" value="#{jdbcProps['main.url']}"></property>
+        <property name="username" value="#{jdbcProps['main.username']}"></property>
+        <property name="password" value="#{jdbcProps['main.password']}"></property>
+    </bean>
+    <bean id="main-slave1" parent="dataSourceBase">
+        <property name="url" value="#{jdbcProps['main.slave1.url']}"></property>
+        <property name="username" value="#{jdbcProps['main.slave1.username']}"></property>
+        <property name="password" value="#{jdbcProps['main.slave1.password']}"></property>
+    </bean>
+
+    <bean id="dataSource" class="com.disarch.datasource.RoutingDataSource">
+        <property name="targetDataSources">
+            <map>
+                <entry key="main-master" value-ref="main-master"/>
+                <entry key="main-slave1" value-ref="main-slave1"/>
+            </map>
+        </property>
+        <property name="defaultTargetDataSource" ref="main-master"></property>
+    </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="mapperLocations">
+            <array>
+                <value>classpath:com/disarch/*/dao/*.xml</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="mapperScanner" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+        <property name="basePackage" value="com.disarch.dao"/>
+    </bean>
+
+    <bean id="maindbChanger" class="com.disarch.datasource.DatasourceChanger" c:datasourceKey="main" c:writeMethodPrefix="create,remove,modify" />
+
+    <bean id="transactionManager"
+          class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
+
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="create*" propagation="REQUIRES_NEW" />
+            <tx:method name="remove*" propagation="REQUIRES_NEW" />
+            <tx:method name="modify*" propagation="REQUIRES_NEW" />
+            <tx:method name="*" propagation="REQUIRES_NEW" read-only="true" />
+        </tx:attributes>
+    </tx:advice>
+
+    <aop:config>
+        <aop:pointcut id="servicePointcut" expression="execution(* com.disarch.service.*.*(..))" />
+        <aop:aspect ref="maindbChanger" order="1">
+            <aop:before method="change" pointcut-ref="servicePointcut"/>
+        </aop:aspect>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="servicePointcut" order="2"/>
+    </aop:config>
+
+</beans>
