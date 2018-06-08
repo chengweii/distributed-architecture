@@ -20,12 +20,12 @@ public class DatasourceChanger {
             String[] writeMethodPrefixArray = StringUtils.delimitedListToStringArray(writeMethodPrefix, ",");
             for (String prefix : writeMethodPrefixArray) {
                 if (methodName.startsWith(prefix)) {
-                    DatasourceHolder.setSlave(this.datasourceKey);
+                    DatasourceHolder.setMaster(this.datasourceKey);
                     return;
                 }
             }
         }
 
-        DatasourceHolder.setMaster(this.datasourceKey);
+        DatasourceHolder.setSlave(this.datasourceKey);
     }
 }

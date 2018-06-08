@@ -18,6 +18,7 @@
         <jedis.version>2.6.0</jedis.version>
         <curator.version>2.6.0</curator.version>
         <druid.version>1.0.7</druid.version>
+        <dubbo.version>2.5.3</dubbo.version>
     </properties>
 
     <dependencyManagement>
@@ -69,6 +70,17 @@
                 <groupId>redis.clients</groupId>
                 <artifactId>jedis</artifactId>
                 <version>${jedis.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>dubbo</artifactId>
+                <version>${dubbo.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>

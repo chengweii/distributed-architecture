@@ -1,15 +1,17 @@
 package com.disarch.mq.service;
 
-import com.disarch.mq.entity.BaseMessage;
 import com.disarch.mq.converter.IMessageConverter;
 import com.disarch.mq.dao.MessageMapper;
 import com.disarch.mq.dao.entity.DbMessage;
+import com.disarch.mq.entity.BaseMessage;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -56,6 +58,17 @@ public class MessageService implements IMessageService {
                 }
             }
         });
+    }
+
+    @Override
+    public void sendAfterCommit(String exchange, String routingKey, BaseMessage message) {
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                                                                      @Override
+                                                                      public void afterCommit() {
+                                                                          send(exchange, routingKey, message);
+                                                                      }
+                                                                  }
+        );
     }
 
 }

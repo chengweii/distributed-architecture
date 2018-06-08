@@ -3,20 +3,20 @@ package com.disarch.mq.entity;
 import java.util.List;
 
 public class SimpleMessage extends BaseMessage {
-    private int event;
+    private int eventCode;
     private List<String> keyList;
 
-    public SimpleMessage(int event, List<String> keyList) {
-        this.event = event;
+    public SimpleMessage(int eventCode, List<String> keyList) {
+        this.eventCode = eventCode;
         this.keyList = keyList;
     }
 
-    public int getEvent() {
-        return event;
+    public int getEventCode() {
+        return eventCode;
     }
 
-    public void setEvent(int event) {
-        this.event = event;
+    public void setEventCode(int eventCode) {
+        this.eventCode = eventCode;
     }
 
     public List<String> getKeyList() {
@@ -31,7 +31,7 @@ public class SimpleMessage extends BaseMessage {
     public String toString() {
         return "SimpleMessage{" +
                 "id=" + getId() +
-                "event=" + event +
+                "eventCode=" + eventCode +
                 ", keyList=" + keyList +
                 '}';
     }

@@ -11,4 +11,13 @@ public interface IMessageService {
      * @param message
      */
     void send(String exchange, String routingKey, BaseMessage message);
+
+    /**
+     * 事务提交后发送消息
+     *
+     * @param exchange
+     * @param routingKey
+     * @param message
+     */
+    void sendAfterCommit(String exchange, String routingKey, BaseMessage message);
 }

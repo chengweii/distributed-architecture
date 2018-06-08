@@ -11,11 +11,11 @@ public interface ICacheService {
 
     boolean setWithExpire(String key, String value, int expire);
 
-    boolean persist(byte[] key, byte[] value);
-
     boolean expire(byte[] key, int expire);
 
-    boolean remove(byte[]... key);
+    boolean remove(String key);
+
+    boolean remove(byte[] key);
 
     boolean exists(byte[] key);
 
