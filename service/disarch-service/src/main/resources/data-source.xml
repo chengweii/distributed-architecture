@@ -10,7 +10,7 @@
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd">
 
     <bean id="jdbcProps" class="com.dangdang.config.service.zookeeper.ZookeeperConfigGroup">
-        <constructor-arg name="configProfile" ref="znServiceConfigProfile" />
+        <constructor-arg name="configProfile" ref="serviceConfigProfile" />
         <constructor-arg name="node" value="jdbc" />
     </bean>
 
