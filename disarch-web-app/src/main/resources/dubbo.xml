@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+    <bean id="dubboProps" class="com.dangdang.config.service.zookeeper.ZookeeperConfigGroup">
+        <constructor-arg name="configProfile" ref="disarchAppConfigProfile" />
+        <constructor-arg name="node" value="dubbo" />
+    </bean>
+
+    <dubbo:application id="serviceApplication" name="disarch-app" />
+
+    <dubbo:monitor protocol="registry" />
+
+    <dubbo:registry protocol="#{dubboProps['register_protocol']}" address="#{dubboProps['register_address']}"
+                    session="#{dubboProps['register_session_expire']}" client="curator" file="#{dubboProps['dubbo.registry.file']}" />
+
+    <dubbo:protocol name="dubbo" port="#{dubboProps['dubbo.protocol.port']}" heartbeat="#{dubboProps['dubbo.protocol.heartbeat']}"
+                    threads="#{dubboProps['dubbo.protocol.threads']}" accepts="#{dubboProps['dubbo.protocol.accepts']}" />
+
+    <dubbo:reference version="1.0" id="cacheService" interface="com.disarch.service.cache.ICacheService"/>
+    <dubbo:reference version="1.0" id="orderService" interface="com.disarch.service.order.IOrderService"/>
+</beans>

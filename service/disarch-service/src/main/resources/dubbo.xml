@@ -26,7 +26,11 @@
                     session="#{dubboProps['register_session_expire']}"
                     client="curator" file="#{dubboProps['dubbo.registry.file']}"/>
 
-    <dubbo:service version="1.1" group="direct" timeout="#{dubboProps['provider.timeout']}" retries="0"
+    <dubbo:service version="1.0" group="direct" timeout="#{dubboProps['provider.timeout']}" retries="0"
                    application="serviceApplication"
                    ref="cacheService" interface="com.disarch.service.cache.ICacheService"/>
+
+    <dubbo:service version="1.0" group="direct" timeout="#{dubboProps['provider.timeout']}" retries="0"
+                   application="serviceApplication"
+                   ref="orderService" interface="com.disarch.service.order.IOrderService"/>
 </beans>
