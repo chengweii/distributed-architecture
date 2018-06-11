@@ -17,5 +17,6 @@
     <groupId>com.disarch</groupId>
     <artifactId>disarch-service-parent</artifactId>
     <version>${disarch-service.version}</version>
+    <packaging>pom</packaging>
 
 </project>
