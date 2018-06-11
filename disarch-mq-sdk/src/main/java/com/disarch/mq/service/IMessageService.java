@@ -14,7 +14,7 @@ public interface IMessageService {
 
     /**
      * 事务提交后发送消息
-     *
+     * 注意：仅限事务环境下使用，非事务环境请使用{@link IMessageService#send}
      * @param exchange
      * @param routingKey
      * @param message
