@@ -18,9 +18,9 @@
 
     <bean id="messageService" class="com.disarch.mq.service.MessageService" c:rabbitTemplate-ref="rabbitTemplate" c:messageConverter-ref="messageConverter" />
 
-    <bean id="orderSyncConsumer" class="com.disarch.service.mq.OrderSyncConsumer"/>
+    <bean id="orderSyncConsumer" class="com.disarch.service.mq.OrderSyncConsumer" />
 
-    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="auto" concurrency="50" requeue-rejected="false" >
-        <rabbit:listener ref="orderSyncConsumer" method="handle"  queue-names="#{mqProps['mq.queue.order-sync']}"/>
+    <rabbit:listener-container connection-factory="connectionFactory" acknowledge="manual" concurrency="4">
+        <rabbit:listener ref="orderSyncConsumer" queue-names="#{mqProps['mq.queue.order-sync']}"/>
     </rabbit:listener-container>
 </beans>
