@@ -1,5 +1,6 @@
 package com.disarch.mq.service;
 
+import com.disarch.mq.common.Constans;
 import com.disarch.mq.converter.IMessageConverter;
 import com.disarch.mq.dao.MessageMapper;
 import com.disarch.mq.dao.entity.DbMessage;
@@ -17,8 +18,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MessageService implements IMessageService {
-
-    private static final String MESSAGE_CANNOT_BE_NULL = "Message cannot be null";
 
     private RabbitTemplate rabbitTemplate;
 
@@ -40,14 +39,13 @@ public class MessageService implements IMessageService {
 
     @Override
     public void send(String exchange, String routingKey, BaseMessage message) {
-        String messagePlain = messageConverter.serialize(Preconditions.checkNotNull(message, MESSAGE_CANNOT_BE_NULL));
+        String messagePlain = messageConverter.serialize(Preconditions.checkNotNull(message, Constans.MESSAGE_CANNOT_BE_NULL));
         DbMessage dbMessage = new DbMessage(exchange, routingKey, messagePlain);
         messageMapper.insert(dbMessage);
 
         // Sync message to queue
         long id = dbMessage.getId();
         executor.execute(new Runnable() {
-
             @Override
             public void run() {
                 try {
@@ -62,13 +60,29 @@ public class MessageService implements IMessageService {
 
     @Override
     public void sendAfterCommit(String exchange, String routingKey, BaseMessage message) {
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
-                                                                      @Override
-                                                                      public void afterCommit() {
-                                                                          send(exchange, routingKey, message);
-                                                                      }
-                                                                  }
-        );
+        String messagePlain = messageConverter.serialize(Preconditions.checkNotNull(message, Constans.MESSAGE_CANNOT_BE_NULL));
+        DbMessage dbMessage = new DbMessage(exchange, routingKey, messagePlain);
+        messageMapper.insert(dbMessage);
+
+        TransactionSynchronizationAdapter transactionSynchronizationAdapter = new TransactionSynchronizationAdapter() {
+            @Override
+            public void afterCommit() {
+                // Sync message to queue
+                long id = dbMessage.getId();
+                executor.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            rabbitTemplate.convertAndSend(exchange, routingKey, messagePlain);
+                            messageMapper.delete(id);
+                        } catch (AmqpException e) {
+                            LOGGER.error("消息发送异常", e);
+                        }
+                    }
+                });
+            }
+        };
+        TransactionSynchronizationManager.registerSynchronization(transactionSynchronizationAdapter);
     }
 
 }
