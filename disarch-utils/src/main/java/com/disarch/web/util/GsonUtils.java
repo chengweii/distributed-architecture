@@ -1,4 +1,4 @@
-package com.disarch.util;
+package com.disarch.web.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

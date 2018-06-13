@@ -1,4 +1,4 @@
-package com.disarch.util;
+package com.disarch.web.util;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
