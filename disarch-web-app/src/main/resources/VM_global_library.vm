@@ -1,0 +1,6 @@
+##布局
+#macro(layout $key)
+	#elseif($key=="Blank")#set($layoutPath="layout/blank.vm")
+	#else #set($layoutPath="layout/default.vm")
+	#end
+#end

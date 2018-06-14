@@ -14,5 +14,12 @@
     <artifactId>disarch-service-sdk</artifactId>
     <version>${disarch-service.version}</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.disarch</groupId>
+            <artifactId>disarch-common</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
 
 </project>

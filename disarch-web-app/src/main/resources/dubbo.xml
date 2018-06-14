@@ -1,24 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd">
 
-    <bean id="dubboProps" class="com.dangdang.config.service.zookeeper.ZookeeperConfigGroup">
-        <constructor-arg name="configProfile" ref="disarchAppConfigProfile" />
-        <constructor-arg name="node" value="dubbo" />
-    </bean>
+	<bean id="dubboProps" class="com.dangdang.config.service.zookeeper.ZookeeperConfigGroup">
+		<constructor-arg name="configProfile" ref="serviceConfigProfile" />
+		<constructor-arg name="node" value="dubbo" />
+	</bean>
 
-    <dubbo:application id="serviceApplication" name="disarch-app" />
+	<dubbo:application id="serviceApplication" name="DISARCH-APP" logger="slf4j"/>
 
-    <dubbo:monitor protocol="registry" />
+	<dubbo:protocol name="dubbo" port="#{dubboProps['dubbo.protocol.port']}"
+					heartbeat="#{dubboProps['dubbo.protocol.heartbeat']}"
+					threads="#{dubboProps['dubbo.protocol.threads']}"
+					accepts="#{dubboProps['dubbo.protocol.accepts']}"/>
 
-    <dubbo:registry protocol="#{dubboProps['register_protocol']}" address="#{dubboProps['register_address']}"
-                    session="#{dubboProps['register_session_expire']}" client="curator" file="#{dubboProps['dubbo.registry.file']}" />
+	<dubbo:provider delay="-1" filter="exception"/>
 
-    <dubbo:protocol name="dubbo" port="#{dubboProps['dubbo.protocol.port']}" heartbeat="#{dubboProps['dubbo.protocol.heartbeat']}"
-                    threads="#{dubboProps['dubbo.protocol.threads']}" accepts="#{dubboProps['dubbo.protocol.accepts']}" />
+	<dubbo:monitor protocol="registry"/>
+		
+	<dubbo:reference version="1.0" timeout="#{dubboProps['provider.timeout']}" id="orderService" interface="com.disarch.service.order.IOrderService" />
 
-    <dubbo:reference version="1.0" id="cacheService" interface="com.disarch.service.cache.ICacheService"/>
-    <dubbo:reference version="1.0" id="orderService" interface="com.disarch.service.order.IOrderService"/>
+	<dubbo:reference version="1.0" timeout="#{dubboProps['provider.timeout']}" id="sessionService" interface="com.disarch.service.session.ISessionService" />
+
 </beans>

@@ -1,8 +1,10 @@
 package com.disarch.service.session;
 
+import com.disarch.common.Channel;
 import com.disarch.entity.UserSession;
 import com.disarch.service.cache.ICacheService;
 import com.disarch.util.SerializationUtils;
+import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
@@ -12,11 +14,21 @@ public class SessionService implements ISessionService {
     @Resource
     private ICacheService cacheService;
 
-    @Value("#{sessionProps['session.expire.time']}")
-    private Integer sessionExpireTime;
+    @Value("#{sessionProps['pc.session.expire.time']}")
+    private Integer pcSessionExpireTime;
+
+    @Value("#{sessionProps['app.session.expire.time']}")
+    private Integer appSessionExpireTime;
+
+    @Value("#{sessionProps['wap.session.expire.time']}")
+    private Integer wapSessionExpireTime;
 
     @Override
     public UserSession getSession(String sessionID) {
+        if (sessionID == null) {
+            return null;
+        }
+        sessionID = sessionID.trim();
         byte[] value = cacheService.get(SerializationUtils.serialize(sessionID));
         UserSession userSession = (UserSession) SerializationUtils.deserialize(value);
         if (userSession != null) {
@@ -27,8 +39,20 @@ public class SessionService implements ISessionService {
 
     @Override
     public boolean setSession(String sessionID, UserSession userSession) {
+        Preconditions.checkNotNull(userSession);
+        Preconditions.checkNotNull(userSession.getChannel());
+
         byte[] value = SerializationUtils.serialize(userSession);
         byte[] key = SerializationUtils.serialize(sessionID);
+
+        Integer sessionExpireTime = null;
+        if (userSession.getChannel() == Channel.PC) {
+            sessionExpireTime = pcSessionExpireTime;
+        } else if (userSession.getChannel() == Channel.APP) {
+            sessionExpireTime = appSessionExpireTime;
+        } else if (userSession.getChannel() == Channel.WAP) {
+            sessionExpireTime = wapSessionExpireTime;
+        }
         return cacheService.setWithExpire(key, value, sessionExpireTime);
     }
 
