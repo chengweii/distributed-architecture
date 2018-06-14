@@ -2,6 +2,7 @@ package com.disarch.web.controller;
 
 import com.disarch.entity.UserSession;
 import com.disarch.service.order.IOrderService;
+import com.disarch.web.common.CommonAction;
 import com.disarch.web.common.Constans;
 import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
@@ -32,5 +33,11 @@ public class OrderController extends BaseController {
         Preconditions.checkNotNull(userSession, Constans.USER_SESSION_EXPIRED);
         model.put("userId", userSession.getUserId());
         return new ModelAndView("order/index").addAllObjects(model);
+    }
+
+    @RequestMapping(value = "/detail.htm", method = RequestMethod.GET)
+    public ModelAndView detail(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        Map<String, Object> model = new HashMap<String, Object>();
+        return ajaxResponse(response, CommonAction.SUCCESS.getStatus(), CommonAction.SUCCESS.getMsg(), model);
     }
 }
