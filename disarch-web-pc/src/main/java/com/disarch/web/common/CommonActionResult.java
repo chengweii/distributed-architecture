@@ -1,6 +1,6 @@
 package com.disarch.web.common;
 
-public enum CommonAction {
+public enum CommonActionResult {
 
     SUCCESS("操作成功", 1),
     FAILED("操作失败", 0);
@@ -8,7 +8,7 @@ public enum CommonAction {
     private String msg;
     private Integer status;
 
-    private CommonAction(String msg, Integer status) {
+    private CommonActionResult(String msg, Integer status) {
         this.msg = msg;
         this.status = status;
     }
@@ -29,8 +29,8 @@ public enum CommonAction {
         this.status = status;
     }
 
-    public static CommonAction getCommonAction(Integer status) {
-        for (CommonAction type : CommonAction.values()) {
+    public static CommonActionResult getCommonAction(Integer status) {
+        for (CommonActionResult type : CommonActionResult.values()) {
             if (type.getStatus().equals(status)) {
                 return type;
             }

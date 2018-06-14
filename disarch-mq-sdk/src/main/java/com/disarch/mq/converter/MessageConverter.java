@@ -1,7 +1,7 @@
 package com.disarch.mq.converter;
 
 import com.disarch.mq.entity.BaseMessage;
-import com.disarch.web.util.GsonUtils;
+import com.disarch.util.GsonUtils;
 
 
 public class MessageConverter implements IMessageConverter{

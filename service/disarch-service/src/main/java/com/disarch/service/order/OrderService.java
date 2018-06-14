@@ -4,6 +4,7 @@ import com.disarch.dao.OrderMapper;
 import com.disarch.entity.Order;
 import com.disarch.mq.entity.SimpleMessage;
 import com.disarch.mq.service.IMessageService;
+import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -22,10 +23,11 @@ public class OrderService implements IOrderService {
     private IMessageService messageService;
 
     @Override
-    public boolean createOrder(Order order) {
+    public int createOrder(Order order) {
+        Preconditions.checkNotNull(order, "订单数据不能为NULL");
         boolean result = orderMapper.insertOrder(order) > 0;
-        SimpleMessage sendMessage = new SimpleMessage(0,new ArrayList<String>());
-        messageService.sendAfterCommit(orderSyncExchange,"",sendMessage);
-        return result;
+        SimpleMessage sendMessage = new SimpleMessage(0, new ArrayList<String>());
+        messageService.sendAfterCommit(orderSyncExchange, "", sendMessage);
+        return order.getId();
     }
 }

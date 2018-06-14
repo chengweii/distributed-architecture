@@ -1,15 +1,16 @@
 package com.disarch.service.session;
 
 import com.disarch.entity.UserSession;
-import com.disarch.service.cache.CacheService;
-import com.disarch.web.util.SerializationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.disarch.service.cache.ICacheService;
+import com.disarch.util.SerializationUtils;
 import org.springframework.beans.factory.annotation.Value;
+
+import javax.annotation.Resource;
 
 public class SessionService implements ISessionService {
 
-    @Autowired
-    private CacheService cacheService;
+    @Resource
+    private ICacheService cacheService;
 
     @Value("#{sessionProps['session.expire.time']}")
     private Integer sessionExpireTime;

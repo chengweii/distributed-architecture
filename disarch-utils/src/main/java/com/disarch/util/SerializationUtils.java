@@ -1,4 +1,4 @@
-package com.disarch.web.util;
+package com.disarch.util;
 
 import java.io.*;
 

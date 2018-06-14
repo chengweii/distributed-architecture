@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-public class SystemController {
+public class SystemController extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemController.class);
 
     @RequestMapping(value = "/error.htm")

@@ -1,10 +1,10 @@
-package com.disarch.web.controller;
+package com.disarch.app.controller;
 
+import com.disarch.app.common.Constans;
 import com.disarch.entity.UserSession;
 import com.disarch.service.session.ISessionService;
-import com.disarch.web.common.Constans;
-import com.disarch.web.util.CookieUtils;
 import com.disarch.util.GsonUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,33 +24,41 @@ public class BaseController {
     private ISessionService sessionService;
 
     public UserSession getSession(HttpServletRequest request, HttpServletResponse response) {
-        String sessionID = CookieUtils.getSessionID(request, response);
+        String sessionID = getSessionID(request, response);
         return sessionService.getSession(sessionID);
     }
 
     public boolean setSession(UserSession userSession, HttpServletRequest request, HttpServletResponse response) {
-        String sessionID = CookieUtils.getSessionID(request, response);
+        String sessionID = getSessionID(request, response);
         return sessionService.setSession(sessionID, userSession);
     }
 
     public boolean clearSession(HttpServletRequest request, HttpServletResponse response) {
-        String sessionID = CookieUtils.getSessionID(request, response);
+        String sessionID = getSessionID(request, response);
         return sessionService.clearSession(sessionID);
     }
 
     public <T> T getSessionAttribute(String attributeName, HttpServletRequest request, HttpServletResponse response) {
-        String sessionID = CookieUtils.getSessionID(request, response);
+        String sessionID = getSessionID(request, response);
         return sessionService.getSessionAttribute(sessionID, attributeName);
     }
 
     public boolean setSessionAttribute(String attributeName, Object attributeValue, HttpServletRequest request, HttpServletResponse response) {
-        String sessionID = CookieUtils.getSessionID(request, response);
+        String sessionID = getSessionID(request, response);
         return sessionService.setSessionAttribute(sessionID, attributeName, attributeValue);
     }
 
     public boolean clearSessionAttribute(String attributeName, HttpServletRequest request, HttpServletResponse response) {
-        String sessionID = CookieUtils.getSessionID(request, response);
+        String sessionID = getSessionID(request, response);
         return sessionService.clearSessionAttribute(sessionID, attributeName);
+    }
+
+    private static String getSessionID(HttpServletRequest request, HttpServletResponse response) {
+        String sessionId = request.getParameter(Constans.SESSION_ID_CACHE_KEY);
+        if (StringUtils.isBlank(sessionId)) {
+            sessionId = request.getSession().getId();
+        }
+        return sessionId;
     }
 
     public static ModelAndView ajaxResponse(HttpServletResponse response, int status, String msg, Map<String, Object> data) throws IOException {
