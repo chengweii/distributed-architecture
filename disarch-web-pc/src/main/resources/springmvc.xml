@@ -31,4 +31,11 @@
 		<property name="configLocation" value="classpath:velocity.properties"></property>
 	</bean>
 
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<mvc:mapping path="/user/**"/>
+			<bean class="com.disarch.web.interceptors.CheckLoginInterceptor"/>
+		</mvc:interceptor>
+	</mvc:interceptors>
+
 </beans>

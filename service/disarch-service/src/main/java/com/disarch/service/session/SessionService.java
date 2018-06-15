@@ -5,6 +5,7 @@ import com.disarch.entity.UserSession;
 import com.disarch.service.cache.ICacheService;
 import com.disarch.util.SerializationUtils;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
@@ -39,8 +40,9 @@ public class SessionService implements ISessionService {
 
     @Override
     public boolean setSession(String sessionID, UserSession userSession) {
-        Preconditions.checkNotNull(userSession);
-        Preconditions.checkNotNull(userSession.getChannel());
+        Preconditions.checkArgument(Strings.isNullOrEmpty(sessionID), "sessionID不能为空");
+        Preconditions.checkNotNull(userSession, "userSession不能为空");
+        Preconditions.checkNotNull(userSession.getChannel(), "userSession.channel不能为空");
 
         byte[] value = SerializationUtils.serialize(userSession);
         byte[] key = SerializationUtils.serialize(sessionID);
@@ -58,12 +60,15 @@ public class SessionService implements ISessionService {
 
     @Override
     public boolean clearSession(String sessionID) {
+        Preconditions.checkArgument(Strings.isNullOrEmpty(sessionID), "sessionID不能为空");
         byte[] key = SerializationUtils.serialize(sessionID);
         return cacheService.remove(key);
     }
 
     @Override
     public <T> T getSessionAttribute(String sessionID, String attributeName) {
+        Preconditions.checkArgument(Strings.isNullOrEmpty(sessionID), "sessionID不能为空");
+        Preconditions.checkArgument(Strings.isNullOrEmpty(attributeName), "attributeName不能为空");
         byte[] value = cacheService.get(SerializationUtils.serialize(sessionID));
         UserSession userSession = (UserSession) SerializationUtils.deserialize(value);
         if (userSession != null) {
@@ -74,6 +79,9 @@ public class SessionService implements ISessionService {
 
     @Override
     public boolean setSessionAttribute(String sessionID, String attributeName, Object attributeValue) {
+        Preconditions.checkArgument(Strings.isNullOrEmpty(sessionID), "sessionID不能为空");
+        Preconditions.checkArgument(Strings.isNullOrEmpty(attributeName), "attributeName不能为空");
+        Preconditions.checkNotNull(attributeValue, "attributeValue不能为空");
         byte[] value = cacheService.get(SerializationUtils.serialize(sessionID));
         UserSession userSession = (UserSession) SerializationUtils.deserialize(value);
         if (userSession != null) {
@@ -86,6 +94,8 @@ public class SessionService implements ISessionService {
 
     @Override
     public boolean clearSessionAttribute(String sessionID, String attributeName) {
+        Preconditions.checkArgument(Strings.isNullOrEmpty(sessionID), "sessionID不能为空");
+        Preconditions.checkArgument(Strings.isNullOrEmpty(attributeName), "attributeName不能为空");
         byte[] value = cacheService.get(SerializationUtils.serialize(sessionID));
         UserSession userSession = (UserSession) SerializationUtils.deserialize(value);
         if (userSession != null) {

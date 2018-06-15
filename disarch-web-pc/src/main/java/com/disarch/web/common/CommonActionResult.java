@@ -3,7 +3,8 @@ package com.disarch.web.common;
 public enum CommonActionResult {
 
     SUCCESS("操作成功", 1),
-    FAILED("操作失败", 0);
+    FAILED("操作失败", 0),
+    USER_SESSION_EXPIRED("您的登录已过期，请重新登录", 99);
 
     private String msg;
     private Integer status;

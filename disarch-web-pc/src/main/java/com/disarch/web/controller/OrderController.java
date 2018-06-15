@@ -35,13 +35,13 @@ public class OrderController extends BaseController {
     }
 
     @RequestMapping(value = "/detail.htm", method = RequestMethod.GET)
-    public ModelAndView detail(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void detail(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String, Object> model = new HashMap<String, Object>();
-        return ajaxResponse(response, CommonActionResult.SUCCESS.getStatus(), CommonActionResult.SUCCESS.getMsg(), model);
+        ajaxResponse(response, CommonActionResult.SUCCESS.getStatus(), CommonActionResult.SUCCESS.getMsg(), model);
     }
 
     @RequestMapping(value = "/create.htm", method = RequestMethod.GET)
-    public ModelAndView create(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public void create(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Map<String, Object> model = new HashMap<String, Object>();
         Order order = new Order();
         order.setCreateTime(new Date());
@@ -49,6 +49,6 @@ public class OrderController extends BaseController {
         order.setStatus(0);
         int result = orderService.createOrder(order);
         CommonActionResult action = result > 0 ? CommonActionResult.SUCCESS : CommonActionResult.FAILED;
-        return ajaxResponse(response, action.getStatus(), action.getMsg(), model);
+        ajaxResponse(response, action.getStatus(), action.getMsg(), model);
     }
 }

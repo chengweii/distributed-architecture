@@ -5,7 +5,8 @@ public enum CommonActionResult {
     SUCCESS("操作成功", 1),
     FAILED("操作失败", 0),
     VERIFY_SIGNATURE_FAILURE("验证签名失败:", 88),
-    USER_SESSION_EXPIRED("您的登录已过期，请重新登录", 99);
+    USER_SESSION_EXPIRED("您的登录已过期，请重新登录", 99),
+    SYSTEM_EXCEPTION("系统异常", 500);
 
     private String msg;
     private Integer status;

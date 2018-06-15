@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.entity.ContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -61,14 +60,13 @@ public class BaseController {
         return sessionId;
     }
 
-    public static ModelAndView ajaxResponse(HttpServletResponse response, int status, String msg, Map<String, Object> data) throws IOException {
+    public static void ajaxResponse(HttpServletResponse response, int status, String msg, Map<String, Object> data) throws IOException {
         response.setCharacterEncoding(ContentType.APPLICATION_JSON.getCharset().name());
         response.setContentType(ContentType.APPLICATION_JSON.getMimeType());
-        Map<String, Object> result = new HashMap<String, Object>();
+        Map<String, Object> result = new HashMap<String, Object>(3);
         result.put(Constans.ACTION_MSG_ATTRIBUTE_KEY, msg);
         result.put(Constans.ACTION_STATUS_ATTRIBUTE_KEY, status);
         result.put(Constans.ACTION_DATA_ATTRIBUTE_KEY, data);
         response.getWriter().write(GsonUtils.toJson(result));
-        return null;
     }
 }

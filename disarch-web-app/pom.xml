@@ -13,6 +13,7 @@
     <groupId>com.disarch</groupId>
     <artifactId>disarch-web-app</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <packaging>war</packaging>
 
     <dependencies>
         <dependency>
