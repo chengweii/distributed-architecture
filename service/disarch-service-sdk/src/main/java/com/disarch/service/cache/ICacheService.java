@@ -19,9 +19,19 @@ public interface ICacheService {
 
     boolean exists(byte[] key);
 
-    long getTime(byte[] key);
+    Long getExpiredTime(byte[] key);
 
-    Long incr(String key);
+    Long getExpiredTime(String key);
 
-    Long decr(String key);
+    Long increaseByStep(String key, int step);
+
+    Long decreaseByStep(String key, int step);
+
+    boolean setNotExistsWithExpire(String key, String value, int expire);
+
+    boolean setNotExistsWithExpireCluster(String key, String value, int expire);
+
+    boolean removeByValueCluster(String key, String value);
+
+    boolean removeByValue(String key, String value);
 }
