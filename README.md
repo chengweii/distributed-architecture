@@ -6,7 +6,7 @@
 ## Mysql集群
 
 ## Redis集群
-![sharding cluster](doc/redis_sharding_cluster.jpg)
+![sharding cluster](doc/redis_sharding_cluster.jpg)  
 通过客户端分片方式实现负载均衡，同时通过VIP+Master-Slave Sync方式实现服务端高可用。
 
 ## RabbitMQ集群
