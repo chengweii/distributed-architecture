@@ -1,4 +1,4 @@
-# A set of infrastructure based distributed architecture for e-commerce
+# 针对电商分布式系统的基础架构
 
 # 环境搭建
 ## 整体架构
