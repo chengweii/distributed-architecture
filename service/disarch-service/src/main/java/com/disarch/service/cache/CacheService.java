@@ -209,7 +209,7 @@ public class CacheService implements ICacheService {
                 try {
                     client.eval(REMOVE_BY_VALUE_SCRIPT, Collections.singletonList(key), Collections.singletonList(value));
                 } catch (Exception e) {
-                    LOGGER.error("setNotExistsWithExpire failed,db:{},msg:{}", client.getDB(), e.getMessage());
+                    LOGGER.error("removeByValueCluster failed,db:{},msg:{}", client.getDB(), e.getMessage());
                 }
             }
             return true;
