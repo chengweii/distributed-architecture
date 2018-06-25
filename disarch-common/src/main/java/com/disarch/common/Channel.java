@@ -2,9 +2,9 @@ package com.disarch.common;
 
 public enum Channel {
 
-    PC("pc", 1),
-    APP("app", 2),
-    WAP("wap", 3);
+    PC("pc", 30 * 60 * 1000),
+    APP("app", 7 * 24 * 60 * 60 * 1000),
+    WAP("wap", 30 * 60 * 1000);
 
     private String name;
     private int value;

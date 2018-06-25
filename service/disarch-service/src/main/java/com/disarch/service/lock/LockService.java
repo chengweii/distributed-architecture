@@ -1,6 +1,6 @@
 package com.disarch.service.lock;
 
-import com.disarch.service.cache.ICacheService;
+import com.disarch.cache.LockJedisAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +10,7 @@ public class LockService implements ILockService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LockService.class);
 
     @Resource
-    private ICacheService cacheService;
+    private LockJedisAccessor lockJedisAccessor;
 
     private static final int DEFAULT_LOCK_EXPIRE_TIME = 10;
 
@@ -29,7 +29,7 @@ public class LockService implements ILockService {
         long startTimeMillis = System.currentTimeMillis();
         long waitMaxTimeMillis = waitMaxTime * 1000;
         while (!result && System.currentTimeMillis() - startTimeMillis < waitMaxTimeMillis) {
-            result = cacheService.setNotExistsWithExpireCluster(getFinalLockKey(lockKey), lockId, expire);
+            result = lockJedisAccessor.setNotExistsWithExpireCluster(getFinalLockKey(lockKey), lockId, expire);
             try {
                 Thread.sleep((long) (waitMaxTimeMillis * Math.random()));
             } catch (InterruptedException e) {
@@ -41,12 +41,12 @@ public class LockService implements ILockService {
 
     @Override
     public boolean unlock(String lockKey, String lockId) {
-        return cacheService.removeByValueCluster(getFinalLockKey(lockKey), lockId);
+        return lockJedisAccessor.removeByValueCluster(getFinalLockKey(lockKey), lockId);
     }
 
     @Override
     public long getLockInvalidTime(String lockKey) {
-        return cacheService.getExpiredTime(getFinalLockKey(lockKey));
+        return lockJedisAccessor.getExpiredTime(getFinalLockKey(lockKey));
     }
 
     private String getFinalLockKey(String lockKey) {

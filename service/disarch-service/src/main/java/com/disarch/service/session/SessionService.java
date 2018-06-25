@@ -1,28 +1,18 @@
 package com.disarch.service.session;
 
+import com.disarch.cache.SessionJedisAccessor;
 import com.disarch.common.Channel;
 import com.disarch.entity.UserSession;
-import com.disarch.service.cache.ICacheService;
 import com.disarch.util.SerializationUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 
 public class SessionService implements ISessionService {
 
     @Resource
-    private ICacheService cacheService;
-
-    @Value("#{sessionProps['pc.session.expire.time']}")
-    private Integer pcSessionExpireTime;
-
-    @Value("#{sessionProps['app.session.expire.time']}")
-    private Integer appSessionExpireTime;
-
-    @Value("#{sessionProps['wap.session.expire.time']}")
-    private Integer wapSessionExpireTime;
+    private SessionJedisAccessor sessionJedisAccessor;
 
     @Override
     public UserSession getSession(String sessionID) {
@@ -30,7 +20,7 @@ public class SessionService implements ISessionService {
             return null;
         }
         sessionID = sessionID.trim();
-        byte[] value = cacheService.get(SerializationUtils.serialize(sessionID));
+        byte[] value = sessionJedisAccessor.get(SerializationUtils.serialize(sessionID));
         UserSession userSession = (UserSession) SerializationUtils.deserialize(value);
         if (userSession != null) {
             setSession(sessionID, userSession);
@@ -49,27 +39,27 @@ public class SessionService implements ISessionService {
 
         Integer sessionExpireTime = null;
         if (userSession.getChannel() == Channel.PC) {
-            sessionExpireTime = pcSessionExpireTime;
+            sessionExpireTime = Channel.PC.getValue();
         } else if (userSession.getChannel() == Channel.APP) {
-            sessionExpireTime = appSessionExpireTime;
+            sessionExpireTime = Channel.APP.getValue();
         } else if (userSession.getChannel() == Channel.WAP) {
-            sessionExpireTime = wapSessionExpireTime;
+            sessionExpireTime = Channel.WAP.getValue();
         }
-        return cacheService.setWithExpire(key, value, sessionExpireTime);
+        return sessionJedisAccessor.setWithExpire(key, value, sessionExpireTime);
     }
 
     @Override
     public boolean clearSession(String sessionID) {
         Preconditions.checkArgument(Strings.isNullOrEmpty(sessionID), "sessionID不能为空");
         byte[] key = SerializationUtils.serialize(sessionID);
-        return cacheService.remove(key);
+        return sessionJedisAccessor.remove(key);
     }
 
     @Override
     public <T> T getSessionAttribute(String sessionID, String attributeName) {
         Preconditions.checkArgument(Strings.isNullOrEmpty(sessionID), "sessionID不能为空");
         Preconditions.checkArgument(Strings.isNullOrEmpty(attributeName), "attributeName不能为空");
-        byte[] value = cacheService.get(SerializationUtils.serialize(sessionID));
+        byte[] value = sessionJedisAccessor.get(SerializationUtils.serialize(sessionID));
         UserSession userSession = (UserSession) SerializationUtils.deserialize(value);
         if (userSession != null) {
             return (T) userSession.getAttributeMap().get(attributeName);
@@ -82,7 +72,7 @@ public class SessionService implements ISessionService {
         Preconditions.checkArgument(Strings.isNullOrEmpty(sessionID), "sessionID不能为空");
         Preconditions.checkArgument(Strings.isNullOrEmpty(attributeName), "attributeName不能为空");
         Preconditions.checkNotNull(attributeValue, "attributeValue不能为空");
-        byte[] value = cacheService.get(SerializationUtils.serialize(sessionID));
+        byte[] value = sessionJedisAccessor.get(SerializationUtils.serialize(sessionID));
         UserSession userSession = (UserSession) SerializationUtils.deserialize(value);
         if (userSession != null) {
             userSession.getAttributeMap().put(attributeName, attributeValue);
@@ -96,7 +86,7 @@ public class SessionService implements ISessionService {
     public boolean clearSessionAttribute(String sessionID, String attributeName) {
         Preconditions.checkArgument(Strings.isNullOrEmpty(sessionID), "sessionID不能为空");
         Preconditions.checkArgument(Strings.isNullOrEmpty(attributeName), "attributeName不能为空");
-        byte[] value = cacheService.get(SerializationUtils.serialize(sessionID));
+        byte[] value = sessionJedisAccessor.get(SerializationUtils.serialize(sessionID));
         UserSession userSession = (UserSession) SerializationUtils.deserialize(value);
         if (userSession != null) {
             userSession.getAttributeMap().remove(attributeName);
