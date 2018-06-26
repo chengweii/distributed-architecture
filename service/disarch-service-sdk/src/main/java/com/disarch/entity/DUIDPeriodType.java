@@ -1,12 +1,12 @@
 package com.disarch.entity;
 
-public enum UUIDPeriodType {
+public enum DUIDPeriodType {
     DAY(1, 24 * 60 * 60),
     MONTH(2, 30 * 24 * 60 * 60),
     QUARTER(3, 4 * 30 * 24 * 60 * 60),
     YEAR(4, 12 * 30 * 24 * 60 * 60);
 
-    private UUIDPeriodType(int code, int seconds) {
+    private DUIDPeriodType(int code, int seconds) {
         this.code = code;
         this.seconds = seconds;
     }

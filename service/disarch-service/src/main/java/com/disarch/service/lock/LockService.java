@@ -3,9 +3,11 @@ package com.disarch.service.lock;
 import com.disarch.cache.LockJedisAccessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+@Service
 public class LockService implements ILockService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LockService.class);
 

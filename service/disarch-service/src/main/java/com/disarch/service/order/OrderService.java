@@ -7,10 +7,12 @@ import com.disarch.mq.service.IMessageService;
 import com.google.common.base.Preconditions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 
+@Service
 public class OrderService implements IOrderService {
 
     @Autowired

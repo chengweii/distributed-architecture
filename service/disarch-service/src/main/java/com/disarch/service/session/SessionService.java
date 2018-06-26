@@ -6,9 +6,11 @@ import com.disarch.entity.UserSession;
 import com.disarch.util.SerializationUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+@Service
 public class SessionService implements ISessionService {
 
     @Resource
