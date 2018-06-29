@@ -14,7 +14,7 @@ public class LockService implements ILockService {
     @Resource
     private LockJedisAccessor lockJedisAccessor;
 
-    private static final int DEFAULT_LOCK_EXPIRE_TIME = 10;
+    private static final int DEFAULT_LOCK_EXPIRE_TIME = 30;
 
     private static final int DEFAULT_LOCK_WAIT_MAX_TIME = 3;
 
