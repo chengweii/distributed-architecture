@@ -9,6 +9,7 @@ import redis.clients.jedis.ShardedJedisPool;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,7 +32,7 @@ public class DUIDJedisAccessor {
         try (ShardedJedis jedis = shardedJedisPool.getResource()) {
             Jedis client = jedis.getShard(key);
             List<String> argvs = new ArrayList<String>();
-            argvs.add(client.getDB().toString());
+            argvs.add(getStartNumber(jedis, client));
             argvs.add(expireTime.toString());
             argvs.add(String.valueOf(DUID_INCREASE_STEP));
             Object result = client.eval(GET_DUID_SCRIPT, Collections.singletonList(key), argvs);
@@ -42,5 +43,17 @@ public class DUIDJedisAccessor {
             LOGGER.error("getDUID failed:", e);
         }
         return -1L;
+    }
+
+    private String getStartNumber(ShardedJedis shardedJedis, Jedis jedis) {
+        Collection<Jedis> allShards = shardedJedis.getAllShards();
+        int i = 1;
+        for (Jedis item : allShards) {
+            if (item.equals(jedis)) {
+                return String.valueOf(i);
+            }
+            i++;
+        }
+        throw new RuntimeException("getDUID startNumber failed");
     }
 }
